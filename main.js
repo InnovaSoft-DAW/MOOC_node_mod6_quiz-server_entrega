@@ -152,7 +152,27 @@ const newView = quiz => {
 
 // View to show a form to edit a given quiz.
 const editView = (quiz) => {
-    // .... introducir código
+    return `<!doctype html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Quiz</title>
+      ${style}
+    </head>
+    <body>
+      <h1>Edit New Quiz</h1>
+      <form method="GET" action="/quizzes/:id/edit">
+        <label for="question">Question: </label>
+        <input type="text" name="question" value="${quiz.question}" placeholder="Question"> 
+        <br>
+        <label for="answer">Answer: </label>
+        <input type="text" name="answer" value="${quiz.answer}" placeholder="Answer">
+        <input type="submit" class="button" value="update">
+      </form>
+      <br>
+      <a href="/quizzes" class="button">Go back</a>
+    </body>
+    </html>`;
 }
 
 
@@ -223,12 +243,20 @@ const createController = async (req, res, next) => {
 
 //  GET /quizzes/:id/edit
 const editController = (req, res, next) => {
-    // .... introducir código
-};
+    const {question, answer} = req.body;
+
+    try {
+        await Quiz.update({question, answer});
+        res.redirect(`/quizzes/:id/edit`);
+    } catch (err) {
+        next(err)
+    }
+};  
 
 //  PUT /quizzes/:id
 const updateController = (req, res, next) => {
-    // .... introducir código
+    const quiz = {question: "", answer: ""};
+    res.send(editView(quiz));
 };
 
 // DELETE /quizzes/:id
@@ -244,8 +272,9 @@ app.get('/quizzes/:id/play', playController);
 app.get('/quizzes/:id/check', checkController);
 app.get('/quizzes/new', newController);
 app.post('/quizzes', createController);
-
-
+app.get('/quizzes/:id/edit', editController);
+app.put('/quizzes/:id', updateController);
+app.delete('/quizzes/:id', destroyController);
 // ..... crear rutas e instalar los MWs para:
 //   GET  /quizzes/:id/edit
 //   PUT  /quizzes/:id
