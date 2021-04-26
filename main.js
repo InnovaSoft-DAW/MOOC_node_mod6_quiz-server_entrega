@@ -246,8 +246,8 @@ const editController = (req, res, next) => {
     const {question, answer} = req.body;
 
     try {
-        await Quiz.update({question, answer});
-        res.redirect(`/quizzes/:id/edit`);
+        // await Quiz.update({question, answer});
+        // res.redirect(`/quizzes/:id/edit`);
     } catch (err) {
         next(err)
     }
@@ -260,8 +260,20 @@ const updateController = (req, res, next) => {
 };
 
 // DELETE /quizzes/:id
-const destroyController = (req, res, next) => {
-    // .... introducir código
+const destroyController = async (req, res, next) => {
+
+    const id = Number(req.params.id);
+    if (Number.isNaN(id)) return next(new Error(`"${req.params.id}" should be number.`));
+
+    try {
+        const quiz = await Quiz.findByPk(id);
+        if(!quiz) return next(new Error(`Quiz ${id} not found.`));
+        await quiz.destroy();
+        res.redirect(`/quizzes`);
+
+    } catch (err) {
+        next(err)
+    }
 };
 
 
